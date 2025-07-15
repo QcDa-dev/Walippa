@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>わりっぱ - 使い方ガイド</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Mochiy+Pop+One&family=Noto+Sans+JP:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Noto Sans JP', sans-serif;
+            background-color: #FFF7ED;
+            color: #4A4A4A;
+        }
+        .font-pop {
+            font-family: 'Mochiy Pop One', sans-serif;
+        }
+        .guide-card {
+            @apply bg-white p-6 rounded-2xl shadow-lg;
+        }
+        /* ★修正点: h2の下線を削除 */
+        .guide-card h2 {
+            font-weight: 900; /* font-black */
+            font-size: 1.25rem;  /* text-xl */
+            line-height: 1.75rem;
+            color: #F97316; /* text-orange-500 */
+            margin-bottom: 1rem; /* mb-4 */
+        }
+        .guide-card p {
+            @apply text-base leading-relaxed mb-4;
+        }
+        .guide-card .step {
+            font-family: 'Mochiy Pop One', sans-serif;
+            color: #F97316; /* h2と同じ色にして統一感を出す */
+            font-size: 2.25rem; /* text-4xl */
+            margin-right: 0.75rem; /* mr-3 */
+            line-height: 1; /* アライメント調整 */
+        }
+        .highlight {
+            @apply bg-orange-100 text-orange-800 font-bold rounded p-1;
+        }
+        .diagram {
+            @apply bg-gray-50 border-2 border-dashed border-gray-300 rounded-lg p-4 text-left my-4;
+        }
+        .diagram-text {
+            @apply text-gray-600 font-semibold;
+        }
+    </style>
+</head>
+<body class="text-gray-800">
+
+    <header class="bg-orange-400 text-white p-4 shadow-md sticky top-0 z-20">
+        <h1 class="text-2xl font-pop text-center">わりっぱ - 使い方ガイド</h1>
+    </header>
+
+    <main class="p-4 sm:p-8 max-w-3xl mx-auto">
+
+        <div class="text-center mb-10">
+            <h1 class="text-4xl font-pop text-orange-600 mb-2">わりっぱへようこそ！</h1>
+            <p class="text-lg text-gray-700">このアプリは、めんどくさい飲み会の割り勘を、<br>シーンに合わせてスマートに計算するためのツールです。</p>
+        </div>
+
+        <div class="space-y-8">
+            <div class="guide-card">
+                <div class="flex items-center">
+                    <span class="step">1</span>
+                    <h2>割り勘の準備</h2>
+                </div>
+                <p>
+                    まずは、割り勘をする<span class="highlight">人数</span>を入力してください。<br>
+                    + / - ボタン、または直接数字を入力して<span class="highlight">「決定」</span>ボタンを押すと、詳細入力フォームが表示されます。
+                </p>
+            </div>
+
+            <div class="guide-card">
+                <div class="flex items-center">
+                    <span class="step">2</span>
+                    <h2>詳細を入力</h2>
+                </div>
+                <p>
+                    次に、飲み会の情報を入力します。
+                </p>
+                <ul class="list-disc list-inside space-y-6 pl-2">
+                    <li>
+                        <strong>計算モードとオプションを選択:</strong>
+                        <p>割り勘の方法をチェックボックスで選びます。</p>
+                        <div class="diagram space-y-3">
+                            <hr>
+                            <p class="diagram-text"><strong>[計算モード]</strong></p>
+                            <p class="diagram-text ml-4"><strong>□ 飲んだ分だけモード:</strong> 飲み物代を飲んだ分だけ各自が払い、それ以外の料金（食事代など）を全員で均等に割る、一番オススメのモードです。</p>
+                            <p class="diagram-text ml-4"><strong>□ 均等割り勘モード:</strong> 合計金額を単純に人数で割る、一番シンプルなモードです。</p>
+                            <p class="diagram-text"><strong>[オプション]</strong></p>
+                            <p class="diagram-text ml-4"><strong>□ 金額指定:</strong> 「上司が1万円多めに払う」など、特定の人が決まった金額を払う場合に使います。上記の計算モードと組み合わせて使えます。</p>
+                            <hr>
+                        </div>
+                    </li>
+                    <li>
+                        <strong>合計金額:</strong>
+                        <p class="inline">お会計の総額を数字で入力してください。</p>
+                    </li>
+                     <li>
+                        <strong>1杯の値段:</strong>
+                        <p class="inline"><span class="highlight">飲んだ分だけモード</span>の時だけ表示されます。飲み会での飲み物1杯の<span class="highlight">平均的な値段</span>を入力してください。</p>
+                    </li>
+                    <li>
+                        <strong>参加者リスト:</strong>
+                        <p>参加者それぞれの名前と、その人が<span class="highlight">飲んだ合計杯数</span>を入力します。<br><span class="highlight">金額指定</span>オプションをチェックしている場合は、「支払い金額」の欄も表示されるので、固定額を払う人の金額を入力してください。<br>（「均等割り勘モード」のみを選択している場合、「飲んだ杯数」の列は表示されません。）</p>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="guide-card">
+                <div class="flex items-center">
+                    <span class="step">3</span>
+                    <h2>計算！</h2>
+                </div>
+                <p>
+                    全ての入力が終わったら、<span class="highlight">「割り勘！」</span>ボタンを押してください。<br>
+                    選択したモードに応じた支払金額が、一瞬で計算されます！
+                </p>
+            </div>
+
+            <div class="guide-card">
+                <div class="flex items-center">
+                    <span class="step">4</span>
+                    <h2>結果を確認</h2>
+                </div>
+                <p>
+                    計算結果が表示されます。選択したモードごとに、カード形式で分かりやすく表示されます。
+                </p>
+                 <p class="mt-4">
+                    <span class="highlight">1人あたり食事代</span>は、「飲んだ分だけモード」で表示される内訳です。これに個人の飲み物代を足したものが、最終的な支払い金額になります。
+                 </p>
+                 <p class="mt-4">
+                    <span class="highlight">不足金額</span>は、計算時の端数（小数点以下の切り捨て）によって発生する差額です。幹事さんが調整してください。
+                </p>
+            </div>
+        </div>
+
+        <div class="text-center mt-12">
+            <p class="text-lg text-gray-700">さあ、あなたも「わりっぱ」で、<br>スマートな割り勘を体験してみてください！</p>
+        </div>
+        
+    </main>
+
+</body>
+</html>
