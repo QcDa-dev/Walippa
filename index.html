@@ -21,14 +21,12 @@
         .font-pop {
             font-family: 'Mochiy Pop One', sans-serif;
         }
-        #menu {
+        /* Header & Menu */
+        #side-menu {
             transition: transform 0.3s ease-in-out;
         }
-        .menu-open {
-            transform: translateX(0);
-        }
-        .menu-closed {
-            transform: translateX(100%);
+        #menu-overlay {
+            transition: opacity 0.3s ease-in-out;
         }
         .btn {
             padding: 12px 20px;
@@ -84,6 +82,7 @@
             font-weight: bold;
             cursor: pointer;
             transition: background-color 0.3s ease, border-color 0.3s ease;
+            flex-shrink: 0;
         }
         .stepper-btn:hover {
             background-color: #E5E7EB;
@@ -100,29 +99,39 @@
         input[type=number] {
             -moz-appearance: textfield;
         }
+        .page-wrapper {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+        main {
+            flex-grow: 1;
+        }
     </style>
 </head>
 <body class="text-gray-800">
-
-    <div id="app-container" class="relative min-h-screen overflow-x-hidden">
-
+    <div class="page-wrapper">
+        <!-- Header -->
         <header class="bg-orange-400 text-white p-4 flex justify-between items-center shadow-md sticky top-0 z-20">
-            <h1 class="text-2xl font-pop">わりっぱ</h1>
+            <a href="index.html" class="text-2xl font-pop cursor-pointer">わりっぱ</a>
             <button id="menu-button" class="z-40 p-2 -mr-2">
                 <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
             </button>
         </header>
 
-        <div id="menu" class="fixed top-0 right-0 h-full w-64 bg-white shadow-lg z-30 menu-closed p-6">
-            <nav class="mt-16">
-                <ul>
-                    <li class="mb-4"><a id="guide-link" href="guide.html" target="_blank" class="text-lg text-orange-600 hover:underline">使い方ガイド</a></li>
-                    <li class="mb-4"><a href="https://docs.google.com/forms/d/e/1FAIpQLSe0NYlA9ZrOnxbvWqpj4Qf8wTx0niWbczDAU0W46k6AkUidgA/viewform?usp=sharing&ouid=103863843545359943443" target="_blank" class="text-lg text-orange-600 hover:underline">お問い合わせ</a></li>
-                    <li class="mb-4"><a href="https://dear-mimosa-0c9.notion.site/230e20387ddf8034915fc8070ec89a90?source=copy_link" target="_blank" class="text-lg text-orange-600 hover:underline">リリースノート</a></li>
-                    <li class="mt-8"><p class="text-sm text-gray-400">ver 1.1.1</p></li>
-                </ul>
-            </nav>
-        </div>
+        <!-- Slide-out Menu -->
+        <div id="menu-overlay" class="fixed inset-0 bg-black bg-opacity-50 z-20 hidden"></div>
+        <nav id="side-menu" class="fixed top-0 right-0 h-full w-64 bg-white shadow-lg z-30 transform translate-x-full p-6">
+            <ul class="mt-16 space-y-4">
+                <li><a href="guide.html" target="_blank" rel="noopener noreferrer" class="text-lg text-orange-600 hover:underline">使い方ガイド</a></li>
+                <li><a href="https://docs.google.com/forms/d/e/1FAIpQLSe0NYlA9ZrOnxbvWqpj4Qf8wTx0niWbczDAU0W46k6AkUidgA/viewform?usp=sharing" target="_blank" rel="noopener noreferrer" class="text-lg text-orange-600 hover:underline">お問い合わせ</a></li>
+                <li><a href="release-notes.html" target="_blank" rel="noopener noreferrer" class="text-lg text-orange-600 hover:underline">リリースノート</a></li>
+                <li class="border-t pt-4 mt-4">
+                    <a href="https://qcda-dev.github.io/HP/" target="_blank" rel="noopener noreferrer" class="text-lg text-orange-600 hover:underline">QcDa Projectとは</a>
+                </li>
+            </ul>
+            <p class="absolute bottom-6 right-6 text-sm text-gray-400">ver 2.0.1</p>
+        </nav>
 
         <main class="p-4 sm:p-6 max-w-2xl mx-auto">
             <div class="bg-white p-5 sm:p-8 rounded-2xl shadow-lg">
@@ -137,80 +146,76 @@
                     <span class="block sm:inline"></span>
                 </div>
 
-                <div id="setup-section" class="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 mb-8">
-                    <label for="member-count-input" class="font-bold text-lg text-orange-800">割り勘人数</label>
-                    <div id="member-count-stepper" class="flex items-center justify-center gap-2">
-                        <button type="button" class="stepper-btn minus-btn" aria-label="減らす">-</button>
-                        <input type="number" id="member-count-input" class="form-input text-center !w-20" value="2" min="1">
-                        <button type="button" class="stepper-btn plus-btn" aria-label="増やす">+</button>
+                <div id="result-form" class="mb-8"></div>
+
+                <div class="space-y-6">
+                    <div class="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4">
+                        <label for="member-count-input" class="font-bold text-lg text-orange-800">割り勘人数</label>
+                        <div id="member-count-stepper" class="flex items-center justify-center gap-2">
+                            <button type="button" class="stepper-btn minus-btn" aria-label="減らす">-</button>
+                            <input type="number" id="member-count-input" class="form-input text-center !w-20" value="2" min="1">
+                            <button type="button" class="stepper-btn plus-btn" aria-label="増やす">+</button>
+                        </div>
                     </div>
-                    <button id="confirm-button" class="btn btn-primary w-full sm:w-auto flex-shrink-0">決定</button>
-                </div>
 
-                <div id="split-form-container" class="hidden">
-                    <div id="result-form" class="mb-8"></div>
-                    
-                    <div class="space-y-6">
-                        <div class="bg-orange-50 p-4 rounded-lg border border-orange-200">
-                            <label class="font-bold text-lg text-orange-800 mb-2 block">計算モード</label>
-                            <div class="flex flex-col sm:flex-row gap-x-6 gap-y-2 flex-wrap">
-                                <div class="flex items-center">
-                                    <!-- ★修正点1: 名称変更 -->
-                                    <input id="fair-share-mode" type="checkbox" checked class="custom-checkbox">
-                                    <label for="fair-share-mode" class="ml-2 text-gray-700">飲んだ分だけモード</label>
-                                </div>
-                                <div class="flex items-center">
-                                    <input id="equal-split-mode" type="checkbox" class="custom-checkbox">
-                                    <label for="equal-split-mode" class="ml-2 text-gray-700">均等割り勘モード</label>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="bg-gray-100 p-4 rounded-lg border border-gray-200">
-                            <label class="font-bold text-lg text-gray-800 mb-2 block">オプション</label>
+                    <div class="bg-orange-50 p-4 rounded-lg border border-orange-200">
+                        <label class="font-bold text-lg text-orange-800 mb-2 block">計算モード</label>
+                        <div class="flex flex-col sm:flex-row gap-x-6 gap-y-2 flex-wrap">
                             <div class="flex items-center">
-                                <input id="amount-specify-option" type="checkbox" class="custom-checkbox">
-                                <label for="amount-specify-option" class="ml-2 text-gray-700">金額指定</label>
+                                <input id="fair-share-mode" type="checkbox" checked class="custom-checkbox">
+                                <label for="fair-share-mode" class="ml-2 text-gray-700">飲んだ分だけモード</label>
+                            </div>
+                            <div class="flex items-center">
+                                <input id="equal-split-mode" type="checkbox" class="custom-checkbox">
+                                <label for="equal-split-mode" class="ml-2 text-gray-700">均等割り勘モード</label>
                             </div>
                         </div>
+                    </div>
+                    
+                    <div class="bg-gray-100 p-4 rounded-lg border border-gray-200">
+                        <label class="font-bold text-lg text-gray-800 mb-2 block">オプション</label>
+                        <div class="flex items-center">
+                            <input id="amount-specify-option" type="checkbox" class="custom-checkbox">
+                            <label for="amount-specify-option" class="ml-2 text-gray-700">金額指定</label>
+                        </div>
+                    </div>
 
-                        <div class="flex flex-col gap-2">
-                            <label for="total-amount" class="font-bold text-lg text-orange-800">合計金額</label>
-                            <div class="flex items-center gap-2 max-w-xs">
-                                <input type="number" id="total-amount" class="form-input flex-grow" placeholder="例: 15000" inputmode="numeric" pattern="[0-9]*">
-                                <span class="font-bold text-lg">円</span>
-                            </div>
+                    <div class="flex flex-col gap-2">
+                        <label for="total-amount" class="font-bold text-lg text-orange-800">合計金額</label>
+                        <div class="flex items-center gap-2 max-w-xs">
+                            <input type="number" id="total-amount" class="form-input flex-grow" placeholder="例: 15000" inputmode="numeric" pattern="[0-9]*">
+                            <span class="font-bold text-lg">円</span>
                         </div>
-                        
-                        <div id="price-per-drink-section" class="flex flex-col gap-2">
-                            <label for="price-per-drink-input" class="font-bold text-lg text-orange-800">1杯の値段</label>
-                            <div class="flex items-center gap-2 max-w-xs">
-                                <input type="number" id="price-per-drink-input" class="form-input flex-grow" placeholder="例: 500" inputmode="numeric" pattern="[0-9]*">
-                                <span class="font-bold text-lg">円</span>
-                            </div>
+                    </div>
+                    
+                    <div id="price-per-drink-section" class="flex flex-col gap-2">
+                        <label for="price-per-drink-input" class="font-bold text-lg text-orange-800">1杯の値段</label>
+                        <div class="flex items-center gap-2 max-w-xs">
+                            <input type="number" id="price-per-drink-input" class="form-input flex-grow" placeholder="例: 500" inputmode="numeric" pattern="[0-9]*">
+                            <span class="font-bold text-lg">円</span>
                         </div>
+                    </div>
 
-                        <div>
-                            <div id="member-grid-header" class="grid grid-cols-2 gap-x-4 mb-2 font-bold text-orange-800 text-center">
-                                <div id="name-header">名前</div>
-                                <div id="drinks-header">飲んだ杯数</div>
-                                <div id="specified-amount-header" class="hidden">支払い金額</div>
-                            </div>
-                            <div id="member-inputs" class="divide-y divide-orange-200 border-y border-orange-200 rounded-lg">
-                            </div>
+                    <div>
+                        <div id="member-grid-header" class="grid gap-x-4 mb-2 font-bold text-orange-800 text-center">
+                            <div id="name-header">名前</div>
+                            <div id="drinks-header">飲んだ杯数</div>
+                            <div id="specified-amount-header" class="hidden">支払い金額</div>
                         </div>
+                        <div id="member-inputs" class="divide-y divide-orange-200 border-y border-orange-200 rounded-lg">
+                        </div>
+                    </div>
 
-                        <div class="flex flex-col sm:flex-row justify-center gap-4 pt-6">
-                            <button id="reset-button" class="btn btn-secondary w-full sm:w-auto order-2 sm:order-1">リセット</button>
-                            <button id="calculate-button" class="btn btn-primary w-full sm:w-auto order-1 sm:order-2">割り勘！</button>
-                        </div>
+                    <div class="flex flex-col sm:flex-row justify-center gap-4 pt-6">
+                        <button id="reset-button" class="btn btn-secondary w-full sm:w-auto order-2 sm:order-1">リセット</button>
+                        <button id="calculate-button" class="btn btn-primary w-full sm:w-auto order-1 sm:order-2">割り勘！</button>
                     </div>
                 </div>
             </div>
         </main>
 
         <div id="spinner-overlay" class="hidden fixed inset-0 bg-white bg-opacity-75 flex justify-center items-center z-50">
-            <div class="spinner"></div>
+            <div class="animate-spin rounded-full h-16 w-16 border-b-4 border-orange-500"></div>
         </div>
 
         <div id="modal-overlay" class="hidden fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50 p-4">
@@ -222,17 +227,18 @@
                 </div>
             </div>
         </div>
-
+        
+        <footer class="text-center py-6 bg-orange-50 text-gray-500 text-sm">
+            <p>© 2025 QcDa Project. All Rights Reserved.</p>
+        </footer>
     </div>
 
     <script>
         // --- DOM Elements ---
         const menuButton = document.getElementById('menu-button');
-        const menu = document.getElementById('menu');
-        const appContainer = document.getElementById('app-container');
+        const sideMenu = document.getElementById('side-menu');
+        const menuOverlay = document.getElementById('menu-overlay');
         const memberCountInput = document.getElementById('member-count-input');
-        const confirmButton = document.getElementById('confirm-button');
-        const splitFormContainer = document.getElementById('split-form-container');
         const memberInputsContainer = document.getElementById('member-inputs');
         const calculateButton = document.getElementById('calculate-button');
         const resetButton = document.getElementById('reset-button');
@@ -241,9 +247,9 @@
         const errorMessageDiv = document.getElementById('error-message');
         const spinnerOverlay = document.getElementById('spinner-overlay');
         const modalOverlay = document.getElementById('modal-overlay');
-        const modalMessage = document.getElementById('modal-message');
-        const modalConfirm = document.getElementById('modal-confirm');
-        const modalCancel = document.getElementById('modal-cancel');
+        let modalMessage = document.getElementById('modal-message');
+        let modalConfirm = document.getElementById('modal-confirm');
+        let modalCancel = document.getElementById('modal-cancel');
         const fairShareModeCheckbox = document.getElementById('fair-share-mode');
         const equalSplitModeCheckbox = document.getElementById('equal-split-mode');
         const amountSpecifyOption = document.getElementById('amount-specify-option');
@@ -253,26 +259,16 @@
 
         // --- Initial Setup ---
         document.addEventListener('DOMContentLoaded', () => {
-        // この中身は空にするか、DOMContentLoadedのイベントリスナー自体を削除してもOKです。
+            updateParticipantForms();
         });
 
         // --- Event Listeners ---
-        menuButton.addEventListener('click', e => { e.stopPropagation(); toggleMenu(); });
-        appContainer.addEventListener('click', () => { if (menu.classList.contains('menu-open')) toggleMenu(); });
-        menu.addEventListener('click', e => e.stopPropagation());
+        menuButton.addEventListener('click', (e) => { e.stopPropagation(); toggleMenu(true); });
+        menuOverlay.addEventListener('click', () => toggleMenu(false));
+        sideMenu.addEventListener('click', e => e.stopPropagation());
 
-        confirmButton.addEventListener('click', () => {
-            const count = parseInt(memberCountInput.value, 10);
-            if (count < 1) { showError('人数は1人以上を選択してください。'); return; }
-            hideError();
-            showSpinner();
-            setTimeout(() => {
-                createSplitForm(count);
-                splitFormContainer.classList.remove('hidden');
-                hideSpinner();
-            }, 500);
-        });
-
+        memberCountInput.addEventListener('input', updateParticipantForms);
+        
         calculateButton.addEventListener('click', () => {
             if (!validateInputs()) return;
             showSpinner();
@@ -297,31 +293,6 @@
             checkbox.addEventListener('change', toggleUiParts);
         });
         
-        function toggleUiParts() {
-            const isFairShare = fairShareModeCheckbox.checked;
-            const isAmountSpecify = amountSpecifyOption.checked;
-            const isOnlyEqualSplit = equalSplitModeCheckbox.checked && !isFairShare;
-
-            pricePerDrinkSection.style.display = isFairShare ? 'flex' : 'none';
-            
-            const showDrinksCol = !isOnlyEqualSplit;
-            const showSpecifiedCol = isAmountSpecify;
-            
-            memberGridHeader.querySelector('#drinks-header').classList.toggle('hidden', !showDrinksCol);
-            memberGridHeader.querySelector('#specified-amount-header').classList.toggle('hidden', !showSpecifiedCol);
-            
-            let gridCols = 1; // Name column
-            if(showDrinksCol) gridCols++;
-            if(showSpecifiedCol) gridCols++;
-            memberGridHeader.className = `grid grid-cols-${gridCols} gap-x-4 mb-2 font-bold text-orange-800 text-center`;
-            
-            document.querySelectorAll('.member-row').forEach(row => {
-                row.querySelector('.drinks-col').classList.toggle('hidden', !showDrinksCol);
-                row.querySelector('.specified-amount-col').classList.toggle('hidden', !showSpecifiedCol);
-                row.className = `member-row grid grid-cols-${gridCols} gap-x-4 items-center p-3`;
-            });
-        }
-
         function setupStepper(stepperId, inputId, minVal) {
             const stepper = document.getElementById(stepperId);
             if (!stepper) return;
@@ -333,6 +304,7 @@
                 value += target.classList.contains('plus-btn') ? 1 : -1;
                 if (minVal !== undefined && value < minVal) value = minVal;
                 input.value = value;
+                input.dispatchEvent(new Event('input'));
             });
         }
         setupStepper('member-count-stepper', 'member-count-input', 1);
@@ -349,7 +321,18 @@
         });
 
         // --- Functions ---
-        const toggleMenu = () => menu.classList.toggle('menu-open') & menu.classList.toggle('menu-closed');
+        function toggleMenu(isOpen) {
+            if(isOpen) {
+                sideMenu.classList.remove('translate-x-full');
+                menuOverlay.classList.remove('hidden');
+                menuOverlay.style.opacity = '1';
+            } else {
+                sideMenu.classList.add('translate-x-full');
+                menuOverlay.style.opacity = '0';
+                setTimeout(() => menuOverlay.classList.add('hidden'), 300);
+            }
+        }
+
         const showSpinner = () => spinnerOverlay.classList.remove('hidden');
         const hideSpinner = () => spinnerOverlay.classList.add('hidden');
         
@@ -363,30 +346,78 @@
         function showModal(message, onConfirm) {
             modalMessage.textContent = message;
             modalOverlay.classList.remove('hidden');
+            
             const newConfirm = modalConfirm.cloneNode(true);
             modalConfirm.parentNode.replaceChild(newConfirm, modalConfirm);
-            newConfirm.addEventListener('click', () => { onConfirm(); modalOverlay.classList.add('hidden'); });
+            modalConfirm = newConfirm;
+            modalConfirm.addEventListener('click', () => { onConfirm(); modalOverlay.classList.add('hidden'); });
+            
             const newCancel = modalCancel.cloneNode(true);
             modalCancel.parentNode.replaceChild(newCancel, modalCancel);
-            newCancel.addEventListener('click', () => modalOverlay.classList.add('hidden'));
+            modalCancel = newCancel;
+            modalCancel.addEventListener('click', () => modalOverlay.classList.add('hidden'));
         }
+        
+        function toggleUiParts() {
+            const isFairShare = fairShareModeCheckbox.checked;
+            const isAmountSpecify = amountSpecifyOption.checked;
+            const isOnlyEqualSplit = equalSplitModeCheckbox.checked && !isFairShare;
 
-        function createSplitForm(count) {
+            pricePerDrinkSection.style.display = isFairShare ? 'flex' : 'none';
+            
+            const showDrinksCol = !isOnlyEqualSplit;
+            const showSpecifiedCol = isAmountSpecify;
+            
+            memberGridHeader.querySelector('#drinks-header').classList.toggle('hidden', !showDrinksCol);
+            memberGridHeader.querySelector('#specified-amount-header').classList.toggle('hidden', !showSpecifiedCol);
+            
+            // ★★★ レイアウトロジック修正 ★★★
+            let gridCols = 1;
+            if(showDrinksCol) gridCols++;
+            if(showSpecifiedCol) gridCols++;
+            memberGridHeader.className = `grid grid-cols-${gridCols} gap-x-4 mb-2 font-bold text-orange-800 text-center`;
+            
+            document.querySelectorAll('.member-row').forEach(row => {
+                row.querySelector('.name-col').classList.remove('col-span-1', 'col-span-2');
+                row.className = `member-row grid grid-cols-${gridCols} gap-x-4 items-center p-3`;
+                row.querySelector('.drinks-col').classList.toggle('hidden', !showDrinksCol);
+                row.querySelector('.specified-amount-col').classList.toggle('hidden', !showSpecifiedCol);
+            });
+        }
+        
+        function updateParticipantForms() {
+            const currentData = [...document.querySelectorAll('.member-row')].map(row => ({
+                name: row.querySelector('.member-name').value,
+                drinks: row.querySelector('.total-drinks').value,
+                specifiedAmount: row.querySelector('.specified-amount').value
+            }));
+
+            const count = parseInt(memberCountInput.value, 10);
+            if (isNaN(count) || count < 1) return;
+
             memberInputsContainer.innerHTML = '';
             resultForm.innerHTML = '';
+
             for (let i = 0; i < count; i++) {
-                const name = `参加者${i + 1}`;
+                const saved = currentData[i] || {};
+                const name = saved.name || `参加者${i + 1}`;
+                const drinks = saved.drinks || "0";
+                const specifiedAmount = saved.specifiedAmount || "";
+                
                 const row = document.createElement('div');
-                row.className = 'member-row grid grid-cols-2 gap-x-4 items-center p-3';
+                row.className = 'member-row'; // Initial class, will be updated by toggleUiParts
+                // ★★★ HTML構造を修正 ★★★
                 row.innerHTML = `
-                    <input type="text" class="form-input member-name text-center" value="${name}">
-                    <div class="drinks-col flex items-center justify-center gap-2">
+                    <div class="name-col">
+                        <input type="text" class="form-input member-name text-center" value="${name}">
+                    </div>
+                    <div class="drinks-col flex items-center justify-center gap-1 sm:gap-2">
                         <button type="button" class="stepper-btn minus-btn" aria-label="減らす">-</button>
-                        <input type="number" class="form-input total-drinks text-center !w-20" value="0" min="0" inputmode="numeric">
+                        <input type="number" class="form-input total-drinks text-center !w-16" value="${drinks}" min="0" inputmode="numeric">
                         <button type="button" class="stepper-btn plus-btn" aria-label="増やす">+</button>
                     </div>
-                    <div class="specified-amount-col hidden">
-                         <input type="number" class="form-input specified-amount text-center" placeholder="0" min="0" inputmode="numeric">
+                    <div class="specified-amount-col">
+                         <input type="number" class="form-input specified-amount text-center" placeholder="0" value="${specifiedAmount}" min="0" inputmode="numeric">
                     </div>
                 `;
                 memberInputsContainer.appendChild(row);
@@ -412,7 +443,8 @@
             if (new Set(names).size !== names.length) { showError('同じ名前が2回以上入力されています。'); return false; }
             return true;
         }
-
+        
+        // ★★★ 計算ロジックを修正 ★★★
         function calculateSplit() {
             const totalAmount = parseInt(totalAmountInput.value, 10);
             
@@ -430,20 +462,26 @@
             const fixedPaymentsSum = fixedPayers.reduce((sum, m) => sum + m.specifiedAmount, 0);
             
             const amountToSplit = totalAmount - fixedPaymentsSum;
-            const membersToSplit = splitters;
-
-            if (membersToSplit.length === 0 && amountToSplit > 0) {
+            
+            if (splitters.length === 0 && amountToSplit > 0) {
                 showError('金額指定されていない参加者がいないため、残りの金額を割り勘できません。');
+                return null;
+            }
+             if (splitters.length > 0 && amountToSplit < 0) {
+                showError('合計金額より、金額指定された支払額の合計が上回っています。');
                 return null;
             }
             
             if (equalSplitModeCheckbox.checked) {
                 let amountPerPerson = 0;
                 let shortfall = 0;
-                if (membersToSplit.length > 0) {
-                    amountPerPerson = Math.floor(amountToSplit / membersToSplit.length);
-                    shortfall = amountToSplit - (amountPerPerson * membersToSplit.length);
+
+                if (splitters.length > 0) {
+                    amountPerPerson = Math.floor(amountToSplit / splitters.length);
                 }
+                const totalCalculated = fixedPaymentsSum + (amountPerPerson * splitters.length);
+                shortfall = totalAmount - totalCalculated;
+
                 results.equalSplit = {
                     members: members.map(m => ({
                         name: m.name,
@@ -456,15 +494,18 @@
 
             if (fairShareModeCheckbox.checked) {
                 const pricePerDrink = parseInt(pricePerDrinkInput.value, 10);
-                const totalDrinkCount = membersToSplit.reduce((sum, m) => sum + m.drinks, 0);
+                const totalDrinkCount = splitters.reduce((sum, m) => sum + m.drinks, 0);
                 const totalDrinkCost = totalDrinkCount * pricePerDrink;
                 
-                if (amountToSplit < totalDrinkCost) { showError('合計金額(指定額を除く)が飲み物代の合計より少ないため、計算できません。'); return null; }
+                if (splitters.length > 0 && amountToSplit < totalDrinkCost) { 
+                    showError('合計金額(指定額を除く)が飲み物代の合計より少ないため、計算できません。'); 
+                    return null; 
+                }
 
                 const foodCost = amountToSplit - totalDrinkCost;
                 let foodCostPerPerson = 0;
-                if (membersToSplit.length > 0) {
-                    foodCostPerPerson = foodCost / membersToSplit.length;
+                if (splitters.length > 0) {
+                    foodCostPerPerson = foodCost / splitters.length;
                 }
 
                 const finalMembers = members.map(m => {
@@ -488,7 +529,7 @@
             }
             return results;
         }
-        
+
         function displayResults(results) {
             if (!results) return;
             resultForm.innerHTML = '';
@@ -496,7 +537,6 @@
 
             if (results.fairShare) {
                 const titleNote = results.fairShare.isAmountSpecify ? '（金額指定あり）' : '';
-                // ★修正点2: 色を入れ替え (オレンジ系)
                 content += `
                     <div class="bg-orange-50 p-4 sm:p-6 rounded-xl border-2 border-orange-200 space-y-4 mb-4">
                          <h4 class="text-xl font-bold text-center text-orange-700">【飲んだ分だけモード${titleNote}】</h4>
@@ -528,7 +568,6 @@
             
             if (results.equalSplit) {
                 const titleNote = results.equalSplit.isAmountSpecify ? '（金額指定あり）' : '';
-                // ★修正点2: 色を入れ替え (青系)
                 content += `
                     <div class="bg-blue-50 p-4 sm:p-6 rounded-xl border-2 border-blue-200 space-y-4">
                         <h4 class="text-xl font-bold text-center text-blue-700">【均等割り勘モード${titleNote}】</h4>
@@ -559,16 +598,14 @@
         function resetAll() {
             hideError();
             memberCountInput.value = '2';
-            splitFormContainer.classList.add('hidden');
-            memberInputsContainer.innerHTML = '';
-            resultForm.innerHTML = '';
             totalAmountInput.value = '';
             pricePerDrinkInput.value = '';
             fairShareModeCheckbox.checked = true;
             equalSplitModeCheckbox.checked = false;
             amountSpecifyOption.checked = false;
-            toggleUiParts();
+            updateParticipantForms();
         }
     </script>
 </body>
 </html>
+
