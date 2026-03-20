@@ -29,6 +29,7 @@ export const initCommonUI = (version = "2.1.0") => {
             <ul class="space-y-4">
                 <li><a href="index.html" class="flex items-center text-lg text-gray-700 hover:text-orange-600 transition-colors font-medium">割り勘計算</a></li>
                 <li><a href="order.html" class="flex items-center text-lg text-gray-700 hover:text-orange-600 transition-colors font-medium">オーダーメモ</a></li>
+                <li class="border-t border-gray-200 pt-4 mt-4"></li>
                 <li><a href="guide.html" target="_blank" rel="noopener noreferrer" class="flex items-center text-lg text-gray-700 hover:text-orange-600 transition-colors font-medium">使い方ガイド</a></li>
                 <li><a href="https://docs.google.com/forms/d/e/1FAIpQLSdlvIr5ehyy3dInl_XTkA5F64H7yFIigL2dzFW0IoXnl8ajdw/viewform?usp=dialog" target="_blank" rel="noopener noreferrer" class="flex items-center text-lg text-gray-700 hover:text-orange-600 transition-colors font-medium">お問い合わせ</a></li>
                 <li><a href="release-notes.html" target="_blank" rel="noopener noreferrer" class="flex items-center text-lg text-gray-700 hover:text-orange-600 transition-colors font-medium">リリースノート</a></li>
