@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta name="google-site-verification" content="E2dZriVq6Lty_WtGgAH-w2vXlPHKzyjzF3hyMLAlZYU" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="飲み会の注文をメモして、同じ飲み物を自動で合計するツールです。">
+    <meta name="keywords" content="わりっぱ, 注文, メモ, 飲み会, オーダー, 合計, 幹事, QcDa Project">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🍻</text></svg>">
+    <title>オーダーメモ | わりっぱ</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="common.css">
+</head>
+<body>
+
+    <main class="p-4 sm:p-8 max-w-2xl mx-auto w-full">
+        <div class="card mb-8 min-h-[60vh] flex flex-col">
+            <div class="text-center mb-6">
+                <h1 class="text-2xl font-pop text-orange-600 mb-2">オーダーメモ</h1>
+                <p class="text-gray-500 text-sm">みんなの注文を入力すると、同じ飲み物を自動で合計します</p>
+            </div>
+
+            <!-- 入力モード -->
+            <div id="input-section" class="flex-grow flex flex-col">
+                <div id="order-rows-container" class="space-y-3 mb-4">
+                    <!-- Javascriptで動的に行が追加されます -->
+                </div>
+
+                <div class="mt-2 mb-8">
+                    <button id="add-row-btn" class="w-full py-3 border-2 border-dashed border-orange-300 text-orange-600 font-bold rounded-xl hover:bg-orange-50 transition-colors flex items-center justify-center">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
+                        飲み物を追加
+                    </button>
+                </div>
+
+                <div class="mt-auto border-t border-gray-100 pt-6">
+                    <button id="order-btn" class="btn btn-primary w-full text-xl py-4 flex items-center justify-center shadow-lg shadow-orange-200">
+                        <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                        注文！ (合計を確認する)
+                    </button>
+                </div>
+            </div>
+
+            <!-- 確認（サマリー）モード -->
+            <div id="summary-section" class="hidden flex-grow flex flex-col">
+                <div class="bg-gradient-to-br from-orange-50 to-amber-50 p-6 rounded-2xl border border-orange-200 shadow-md mb-6 flex-grow">
+                    <h2 class="text-xl font-bold text-orange-800 mb-6 flex items-center justify-center border-b border-orange-200 pb-4">
+                        <svg class="w-6 h-6 mr-2 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg>
+                        注文まとめ
+                    </h2>
+                    
+                    <ul id="summary-list" class="space-y-2">
+                        <!-- Javascriptで集計結果が表示されます -->
+                    </ul>
+                </div>
+
+                <div class="mt-auto flex gap-4">
+                    <button id="clear-all-btn" class="btn btn-secondary flex-1 flex items-center justify-center">
+                        <svg class="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                        リセット
+                    </button>
+                    <button id="edit-btn" class="btn bg-orange-500 hover:bg-orange-600 text-white flex-[2] flex items-center justify-center shadow-md">
+                        <svg class="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                        入力を修正する
+                    </button>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <script type="module">
+        import { initCommonUI } from './common.js';
+
+        document.addEventListener('DOMContentLoaded', () => {
+            initCommonUI("2.2.0");
+
+            const container = document.getElementById('order-rows-container');
+            const addRowBtn = document.getElementById('add-row-btn');
+            const orderBtn = document.getElementById('order-btn');
+            const editBtn = document.getElementById('edit-btn');
+            const clearAllBtn = document.getElementById('clear-all-btn');
+            
+            const inputSection = document.getElementById('input-section');
+            const summarySection = document.getElementById('summary-section');
+            const summaryList = document.getElementById('summary-list');
+
+            // --- 入力行の生成ロジック ---
+            function createOrderRow(drinkName = '', drinkCount = 1) {
+                const row = document.createElement('div');
+                row.className = 'order-row flex items-center gap-2 bg-gray-50 p-2 rounded-xl border border-gray-200 transition-all hover:border-orange-200';
+                
+                row.innerHTML = `
+                    <div class="flex-grow">
+                        <input type="text" class="drink-name form-input !py-3 font-medium bg-white placeholder-gray-400 border-none shadow-sm focus:ring-2 focus:ring-orange-300" placeholder="飲み物の名前 (例: 生ビール)" value="${drinkName}">
+                    </div>
+                    <div class="flex items-center gap-1 sm:gap-2 shrink-0">
+                        <button type="button" class="stepper-btn minus-btn !w-10 !h-10 bg-white" aria-label="減らす">-</button>
+                        <input type="number" class="drink-count form-input text-center font-bold !w-14 !p-2 border-none shadow-sm" value="${drinkCount}" min="1" inputmode="numeric">
+                        <button type="button" class="stepper-btn plus-btn !w-10 !h-10 bg-white" aria-label="増やす">+</button>
+                    </div>
+                    <button type="button" class="delete-row-btn p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors shrink-0" aria-label="削除">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                    </button>
+                `;
+
+                // ステッパーイベント設定
+                const countInput = row.querySelector('.drink-count');
+                row.querySelector('.minus-btn').addEventListener('click', () => {
+                    let val = parseInt(countInput.value, 10) || 1;
+                    if (val > 1) countInput.value = val - 1;
+                });
+                row.querySelector('.plus-btn').addEventListener('click', () => {
+                    let val = parseInt(countInput.value, 10) || 0;
+                    countInput.value = val + 1;
+                });
+
+                // 行の削除イベント設定
+                row.querySelector('.delete-row-btn').addEventListener('click', () => {
+                    row.remove();
+                    // すべての行が消えたら空の1行を追加する
+                    if (container.children.length === 0) {
+                        container.appendChild(createOrderRow());
+                    }
+                });
+
+                return row;
+            }
+
+            // 初期状態で1行追加
+            container.appendChild(createOrderRow());
+
+            // 「飲み物を追加」ボタン
+            addRowBtn.addEventListener('click', () => {
+                const newRow = createOrderRow();
+                container.appendChild(newRow);
+                // 新しい行の名前入力欄にフォーカスを当てる
+                newRow.querySelector('.drink-name').focus();
+            });
+
+            // --- 集計ロジック ---
+            orderBtn.addEventListener('click', () => {
+                const rows = document.querySelectorAll('.order-row');
+                const summary = {};
+                let hasValidInput = false;
+
+                rows.forEach(row => {
+                    // 全角・半角スペースの除去や大文字小文字の差異を吸収して正規化
+                    let rawName = row.querySelector('.drink-name').value;
+                    let name = rawName.trim().replace(/　/g, ' '); // 全角スペースを半角に
+                    
+                    const count = parseInt(row.querySelector('.drink-count').value, 10) || 0;
+
+                    if (name !== '' && count > 0) {
+                        hasValidInput = true;
+                        if (summary[name]) {
+                            summary[name] += count;
+                        } else {
+                            summary[name] = count;
+                        }
+                    }
+                });
+
+                if (!hasValidInput) {
+                    alert('飲み物の名前と杯数を入力してください。');
+                    return;
+                }
+
+                // サマリー画面の構築
+                summaryList.innerHTML = '';
+                for (const [drinkName, totalCount] of Object.entries(summary)) {
+                    const li = document.createElement('li');
+                    li.className = 'flex justify-between items-center p-3 bg-white rounded-xl shadow-sm border border-orange-100';
+                    li.innerHTML = `
+                        <span class="font-bold text-gray-800 text-lg pl-2 truncate pr-4">${drinkName}</span>
+                        <div class="bg-orange-100 text-orange-800 font-black text-xl px-4 py-1.5 rounded-lg shrink-0">
+                            ${totalCount} <span class="text-sm font-normal">杯</span>
+                        </div>
+                    `;
+                    summaryList.appendChild(li);
+                }
+
+                // 画面切り替え
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+                inputSection.classList.add('hidden');
+                summarySection.classList.remove('hidden');
+            });
+
+            // --- 修正・リセットロジック ---
+            editBtn.addEventListener('click', () => {
+                summarySection.classList.add('hidden');
+                inputSection.classList.remove('hidden');
+            });
+
+            clearAllBtn.addEventListener('click', () => {
+                if(confirm('入力した注文をすべてリセットしますか？')) {
+                    container.innerHTML = '';
+                    container.appendChild(createOrderRow());
+                    summarySection.classList.add('hidden');
+                    inputSection.classList.remove('hidden');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
