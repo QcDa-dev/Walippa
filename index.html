@@ -12,6 +12,37 @@
     <title>わりっぱ | スマート割り勘計算</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="common.css">
+    <style>
+        /* 参加者リストの列レイアウト (列数に応じて .cols-1 / .cols-2 / .cols-3) */
+        .member-grid {
+            display: grid;
+            column-gap: 1rem;
+        }
+        .member-grid.cols-1 { grid-template-columns: minmax(0, 1fr); }
+        .member-grid.cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        .member-grid.cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+        .cell-label { display: none; }
+
+        /* スマホ幅: 杯数の欄は +/- ボタンぶんの幅を確保し、はみ出して隣と重ならないようにする */
+        @media (max-width: 639px) {
+            .member-grid.cols-2 { grid-template-columns: minmax(0, 1fr) 9.5rem; }
+            /* 3列(金額指定あり)のときは、名前を1行目、杯数と金額を2行目に並べる */
+            #member-grid-header.cols-3 { display: none; }
+            .member-row.cols-3 {
+                grid-template-columns: 9.5rem minmax(0, 1fr);
+                row-gap: 0.5rem;
+            }
+            .member-row.cols-3 .name-col { grid-column: 1 / -1; }
+            .member-row.cols-3 .cell-label {
+                display: block;
+                margin-bottom: 0.25rem;
+                text-align: center;
+                font-size: 0.75rem;
+                font-weight: 700;
+                color: #6b7280; /* gray-500 */
+            }
+        }
+    </style>
 </head>
 <body>
 
@@ -93,7 +124,7 @@
                         <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
                         参加者リスト
                     </h3>
-                    <div id="member-grid-header" class="grid gap-x-4 mb-2 font-bold text-gray-500 text-sm text-center tracking-wide border-b border-gray-200 pb-2">
+                    <div id="member-grid-header" class="member-grid cols-2 mb-2 font-bold text-gray-500 text-sm text-center tracking-wide border-b border-gray-200 pb-2">
                         <div id="name-header">名前</div>
                         <div id="drinks-header">飲んだ杯数</div>
                         <div id="specified-amount-header" class="hidden">支払い金額</div>
@@ -140,7 +171,10 @@
         import { initCommonUI } from './common.js';
 
         document.addEventListener('DOMContentLoaded', () => {
-            initCommonUI("2.1.0");
+            initCommonUI("2.2.1");
+
+            // 名前などを innerHTML に入れるときの安全対策
+            const escapeHtml = (value) => String(value).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
             // --- DOM Elements ---
             const memberCountInput = document.getElementById('member-count-input');
@@ -266,10 +300,10 @@
                 let gridCols = 1;
                 if(showDrinksCol) gridCols++;
                 if(showSpecifiedCol) gridCols++;
-                memberGridHeader.className = `grid grid-cols-${gridCols} gap-x-4 mb-2 font-bold text-gray-500 text-sm text-center tracking-wide border-b border-gray-200 pb-2`;
+                memberGridHeader.className = `member-grid cols-${gridCols} mb-2 font-bold text-gray-500 text-sm text-center tracking-wide border-b border-gray-200 pb-2`;
                 
                 document.querySelectorAll('.member-row').forEach(row => {
-                    row.className = `member-row grid grid-cols-${gridCols} gap-x-4 items-center bg-gray-50 p-3 rounded-lg border border-gray-100 hover:border-orange-200 transition-colors`;
+                    row.className = `member-row member-grid cols-${gridCols} items-center bg-gray-50 p-3 rounded-lg border border-gray-100 hover:border-orange-200 transition-colors`;
                     row.querySelector('.drinks-col').classList.toggle('hidden', !showDrinksCol);
                     row.querySelector('.specified-amount-col').classList.toggle('hidden', !showSpecifiedCol);
                 });
@@ -298,15 +332,19 @@
                     row.className = 'member-row'; 
                     row.innerHTML = `
                         <div class="name-col">
-                            <input type="text" class="form-input member-name text-center font-medium bg-white" value="${name}">
+                            <input type="text" class="form-input member-name text-center font-medium bg-white" value="${escapeHtml(name)}" aria-label="参加者${i + 1}の名前">
                         </div>
-                        <div class="drinks-col flex items-center justify-center gap-1 sm:gap-2">
-                            <button type="button" class="stepper-btn minus-btn !w-8 !h-8 sm:!w-10 sm:!h-10" aria-label="減らす">-</button>
-                            <input type="number" class="form-input total-drinks text-center font-bold !w-16 !p-1 sm:!p-2 bg-white" value="${drinks}" min="0" inputmode="numeric">
-                            <button type="button" class="stepper-btn plus-btn !w-8 !h-8 sm:!w-10 sm:!h-10" aria-label="増やす">+</button>
+                        <div class="drinks-col">
+                            <span class="cell-label">飲んだ杯数</span>
+                            <div class="flex items-center justify-center gap-1 sm:gap-2">
+                                <button type="button" class="stepper-btn minus-btn !w-8 !h-8 sm:!w-10 sm:!h-10" aria-label="減らす">-</button>
+                                <input type="number" class="form-input total-drinks text-center font-bold !w-16 !p-1 sm:!p-2 bg-white" value="${drinks}" min="0" inputmode="numeric">
+                                <button type="button" class="stepper-btn plus-btn !w-8 !h-8 sm:!w-10 sm:!h-10" aria-label="増やす">+</button>
+                            </div>
                         </div>
                         <div class="specified-amount-col">
-                             <input type="number" class="form-input specified-amount text-center font-bold bg-white" placeholder="0" value="${specifiedAmount}" min="0" inputmode="numeric">
+                            <span class="cell-label">支払い金額</span>
+                            <input type="number" class="form-input specified-amount text-center font-bold bg-white" placeholder="0" value="${specifiedAmount}" min="0" inputmode="numeric">
                         </div>
                     `;
                     memberInputsContainer.appendChild(row);
@@ -445,7 +483,7 @@
                     results.fairShare.members.forEach(member => {
                         content += `
                             <div class="flex justify-between items-center p-2 hover:bg-white rounded-lg transition-colors">
-                                <span class="font-medium text-gray-800 truncate pr-2">${member.name}</span>
+                                <span class="font-medium text-gray-800 truncate pr-2">${escapeHtml(member.name)}</span>
                                 <span class="font-bold text-xl text-gray-900 whitespace-nowrap">${member.amount.toLocaleString()} <span class="text-sm font-normal text-gray-500">円</span></span>
                             </div>
                         `;
@@ -473,7 +511,7 @@
                     results.equalSplit.members.forEach(member => {
                         content += `
                             <div class="flex justify-between items-center p-2 hover:bg-white rounded-lg transition-colors">
-                                <span class="font-medium text-gray-800 truncate pr-2">${member.name}</span>
+                                <span class="font-medium text-gray-800 truncate pr-2">${escapeHtml(member.name)}</span>
                                 <span class="font-bold text-xl text-gray-900 whitespace-nowrap">${member.amount.toLocaleString()} <span class="text-sm font-normal text-gray-500">円</span></span>
                             </div>
                         `;
